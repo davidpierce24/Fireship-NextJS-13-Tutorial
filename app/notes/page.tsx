@@ -1,0 +1,55 @@
+import Link from "next/link";
+import styles from './Notes.module.css';
+import PocketBase from 'pocketbase';
+
+export const dynamic = 'auto',
+    dynamicParams = true,
+    revalidate = 0,
+    fetchCache = 'auto',
+    runtime = 'nodejs',
+    preferredRegion = 'auto'
+
+
+let getNotes = async () => {
+
+    const db = new PocketBase('http://127.0.0.1:8090');
+    const data = await db.collection('todo').getList();
+
+    // const res = await fetch(
+    //     'http://127.0.0.1:8090/api/collections/todo/records?page=1&perPage=30',
+    //     { cache:'no-store' }
+    // );
+    // const data = await res.json();
+    return data?.items as any[];
+}
+
+let Note = ({ note }: any) => {
+    const { id, title, notes, created } = note || {};
+    let date = new Date(created);
+
+    return(
+        <Link href={`/notes/${id}`}>
+            <div className={styles.note}>
+                <h2>{title}</h2>
+                <h5>{notes}</h5>
+                <p>{date.toLocaleString()}</p>
+            </div>
+        </Link>
+    )
+}
+
+export default async function NotesPage() {
+    const notes = await getNotes();
+
+    return (
+        <div style={{gap:"20px"}}>
+            <h1>Notes</h1>
+            <div className={styles.grid}>
+                {notes?.map((note) => {
+                    return <Note key={note.id} note={note} />;
+                })}
+            </div>
+        </div>
+    )
+}
+
