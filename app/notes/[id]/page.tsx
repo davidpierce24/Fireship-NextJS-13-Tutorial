@@ -1,4 +1,5 @@
 import styles from '../Notes.module.css'
+import CreateNote from './CreateNote';
 
 
 let getNote = async (noteId: string) => {
